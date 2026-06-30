@@ -908,4 +908,110 @@ $('#btnLogout').addEventListener('click', e => {
   location.reload();
 });
 
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kSeq = [];
+let indianOn = false;
+let indianAudio = null;
+
+const TOURISTA = [
+  { t: 'initialisation du radar tourista', k: 'init' },
+  { t: 'cheese naan localisé', k: 'ok' },
+  { t: 'poulet tikka massala : coordonnées acquises', k: 'ok' },
+  { t: 'samosa chaud détecté (croustillant confirmé)', k: 'ok' },
+  { t: 'lassi mangue : stock validé', k: 'ok' },
+  { t: 'biryani géolocalisé à 200 m', k: 'ok' },
+  { t: 'tuk-tuk en approche — tarif négocié', k: 'ok' },
+  { t: 'vache sacrée sur la voie : contournement', k: 'warn' },
+  { t: 'klaxon calibré à 128 dB', k: 'ok' },
+  { t: 'Taj Mahal indexé en haute résolution', k: 'ok' },
+  { t: 'thé masala chai infusé', k: 'ok' },
+  { t: 'chorégraphie Bollywood synchronisée', k: 'ok' },
+  { t: 'MISSION TOURISTA : SUCCÈS — NAMASTÉ', k: 'final' },
+];
+
+function imLine(item) {
+  const feed = $('#imFeed');
+  if (!feed) return;
+  const span = document.createElement('span');
+  span.className = 'im-line imk-' + item.k;
+  let prefix = '> ';
+  let suffix = '';
+  if (item.k === 'ok') { prefix = '  '; suffix = ' <span class="chk">✓</span>'; }
+  else if (item.k === 'warn') { prefix = '  ! '; }
+  else if (item.k === 'final') { prefix = '>> '; }
+  span.innerHTML = prefix + item.t + suffix;
+  feed.appendChild(span);
+  feed.scrollTop = feed.scrollHeight;
+  if (item.k === 'final') beep(880, 0.12, 'sine', 0.08);
+  else beep(item.k === 'warn' ? 320 : 620, 0.04, 'square', 0.06);
+}
+
+function spawnEmojis() {
+  const box = $('#imEmojis');
+  if (!box || REDUCED) return;
+  box.innerHTML = '';
+  const set = ['🧀','🍛','🐘','🛺','🇮🇳','🙏','🥘','🫓','🐅','🪕'];
+  for (let i = 0; i < 26; i++) {
+    const s = document.createElement('span');
+    s.textContent = set[Math.floor(Math.random() * set.length)];
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.animationDuration = (4 + Math.random() * 5) + 's';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    s.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+    box.appendChild(s);
+  }
+}
+
+async function openIndian() {
+  if (indianOn) return;
+  indianOn = true;
+  armAudio();
+  try { stopDrone(); } catch (_) {}
+  const overlay = $('#indianMode');
+  const feed = $('#imFeed');
+  if (feed) feed.innerHTML = '';
+  if (overlay) overlay.classList.remove('hidden');
+  spawnEmojis();
+  flash(0.25, '#FF9933');
+  indianAudio = $('#indianAudio');
+  if (indianAudio) {
+    indianAudio.volume = 0.8;
+    indianAudio.currentTime = 0;
+    indianAudio.play().catch(() => {});
+  }
+  for (const item of TOURISTA) {
+    if (!indianOn) return;
+    imLine(item);
+    await sleep(item.k === 'final' ? 500 : 360);
+  }
+}
+
+function closeIndian() {
+  if (!indianOn) return;
+  indianOn = false;
+  const overlay = $('#indianMode');
+  if (overlay) overlay.classList.add('hidden');
+  if (indianAudio) { indianAudio.pause(); indianAudio.currentTime = 0; }
+  const box = $('#imEmojis');
+  if (box) box.innerHTML = '';
+  if (soundOn && hudReady) { try { startDrone(); } catch (_) {} }
+}
+
+window.addEventListener('keydown', e => {
+  kSeq.push(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+  kSeq = kSeq.slice(-KONAMI.length);
+  if (KONAMI.every((k, i) => k === kSeq[i])) {
+    kSeq = [];
+    openIndian();
+  }
+});
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && indianOn) closeIndian();
+});
+
+$('#indianMode').addEventListener('click', e => {
+  if (e.target.id === 'indianMode') closeIndian();
+});
+
 })();
