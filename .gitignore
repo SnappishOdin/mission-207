@@ -1,0 +1,7 @@
+# Outillage local (serveur de preview) — inutile en ligne
+.claude/
+
+# Divers OS / éditeurs
+.DS_Store
+Thumbs.db
+*.log

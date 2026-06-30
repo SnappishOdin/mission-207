@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="B.R.S. // MISSION 207 — Terminal de consultation : rapports de surveillance du 212e Bataillon (mandat de l'Amirauté)." />
+<title>B.R.S. // MISSION 207 · Rapports</title>
+
+<!-- ========= POLICES GOOGLE FONTS (seule ressource externe hors logo) ========= -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+<link rel="icon" type="image/png" href="logobrs.png" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="no-js">
+
+<!-- no-js fallback -->
+<noscript>
+  <div class="nojs">
+    <h1>MISSION 207</h1>
+    <p>Ce terminal de consultation nécessite JavaScript pour déchiffrer et afficher le dossier. Activez JavaScript pour l'ouvrir.</p>
+  </div>
+</noscript>
+
+<!-- ============================================================= -->
+<!-- FONDS GLOBAUX : starfield + scanlines + vignette + flash       -->
+<!-- ============================================================= -->
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div id="scanlines" aria-hidden="true"></div>
+<div id="vignette" aria-hidden="true"></div>
+<div id="flash" aria-hidden="true"></div>
+
+<!-- ============================================================= -->
+<!-- BEAT 0 : ÉCRAN D'AMORÇAGE (arme l'AudioContext via le clic)    -->
+<!-- ============================================================= -->
+<section id="screen-boot" class="screen screen-boot" aria-label="Ouverture du dossier 207">
+  <div class="boot-inner">
+    <p class="boot-tag" aria-hidden="true">VISOR // DOSSIER CHIFFRÉ — 207</p>
+    <img src="logobrs.png" alt="Emblème B.R.S." class="boot-logo" id="bootLogo" />
+    <p class="boot-line"><span class="prompt">&gt;</span> ACCÈS RESTREINT · CODE REQUIS<span class="dots">…</span></p>
+    <p class="boot-target" aria-hidden="true">&gt; diffusion restreinte (Amirauté) · personnel habilité uniquement</p>
+    <div class="pass-field">
+      <input id="passInput" type="password" class="pass-input" placeholder="• • • • • •" autocomplete="off" spellcheck="false" aria-label="Code d'accès" />
+      <p id="passError" class="pass-error" aria-live="polite"></p>
+    </div>
+    <button id="btnInit" class="btn-init" type="button">
+      [ DÉVERROUILLER LE DOSSIER 207 ]
+      <span class="btn-sub">validez le code pour déchiffrer le terminal</span>
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- INTRO : OUVERTURE DE SESSION (pluie de code + lignes de code)  -->
+<!-- ============================================================= -->
+<section id="screen-crawl" class="screen screen-session hidden" aria-label="Déchiffrement du dossier">
+  <canvas id="codeRain" aria-hidden="true"></canvas>
+  <div class="session-wrap" id="breachWrap">
+    <div class="session-head">
+      <span class="session-id">VISOR // DÉCHIFFREMENT 207</span>
+      <span class="session-status" id="sessionStatus">LIAISON…</span>
+    </div>
+    <pre class="session-log" id="sessionLog" aria-live="polite"></pre>
+    <span class="session-caret" aria-hidden="true"></span>
+  </div>
+  <div class="granted" id="granted" hidden>
+    <img src="logobrs.png" alt="" class="granted-seal" aria-hidden="true" />
+    <span class="granted-big">DOSSIER OUVERT</span>
+    <span class="granted-sub">207</span>
+  </div>
+  <button id="btnSkip" class="btn-skip" type="button">PASSER L'INTRO &raquo;</button>
+</section>
+
+<!-- ============================================================= -->
+<!-- TERMINAL DE CONSULTATION — DOSSIER 207                     -->
+<!-- ============================================================= -->
+<main id="hud" class="hud hidden" aria-label="Terminal de consultation 207">
+
+  <span class="bracket tl" aria-hidden="true"></span>
+  <span class="bracket tr" aria-hidden="true"></span>
+  <span class="bracket bl" aria-hidden="true"></span>
+  <span class="bracket br" aria-hidden="true"></span>
+
+  <!-- ---------- TOPBAR ---------- -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <img src="logobrs.png" alt="Sceau B.R.S." class="seal" />
+      <div class="brand">
+        <strong>B.R.S.</strong>
+        <span>// BUREAU DU RENSEIGNEMENT SÉNATORIAL — MISSION 207</span>
+      </div>
+    </div>
+    <div class="topbar-center" aria-hidden="true">
+      <span class="telem">SECTEUR <b id="tSector">—</b></span>
+      <span class="telem">COORD <b id="tCoord">—</b></span>
+      <span class="telem">H.STELLAIRE <b id="tTime">—</b></span>
+    </div>
+    <div class="topbar-right">
+      <span class="link-status"><i class="dot"></i> LIAISON : SÉCURISÉE</span>
+      <button id="btnMute" class="btn-mute" type="button" aria-pressed="false" title="Activer / couper le son">
+        <span class="mute-on">&#9835; SON</span>
+        <span class="mute-off">&#9834; MUET</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ---------- NAV ---------- -->
+  <nav class="hud-nav" aria-label="Navigation">
+    <a href="#rapports" data-nav>RAPPORTS</a>
+    <a href="#" id="btnReplay" data-nav>&#9658; REJOUER L'INTRO</a>
+  </nav>
+
+  <!-- ---------- DASHBOARD BODY ---------- -->
+  <div class="hud-body">
+    
+    <!-- CONTENU PRINCIPAL (DOSSIER & CARTES) -->
+    <div class="hud-content">
+      <!-- ---------- EN-TÊTE DOSSIER ---------- -->
+      <section id="rapports" class="panel dossier-head">
+        <div class="dossier-text">
+          <h1 class="omega-title" data-text="MISSION 207">MISSION 207</h1>
+          <p class="dossier-sub">DOSSIER M-207 — CONFIDENTIEL · DIFFUSION RESTREINTE (AMIRAUTÉ)</p>
+          <!-- === ZONE ÉDITABLE : paragraphe de contexte de la mission === -->
+          <p class="dossier-brief">
+            Sur mandat de l'Amirauté, le B.R.S a placé le <b>212e Bataillon</b> sous
+            <b>surveillance générale</b> — commandement, encadrement et effectifs. Les
+            <b>deux rapports</b> ci-dessous (surveillance et clôture) sont mis à disposition
+            pour consultation et téléchargement.
+          </p>
+        </div>
+        <div class="dossier-count">
+          <b id="cRapports">02</b><span>RAPPORTS</span>
+        </div>
+      </section>
+
+      <!-- ---------- LES 2 CARTES-RAPPORT ---------- -->
+      <div class="reports-list">
+
+        <!-- ===== CARTE 1 : RAPPORT DE SURVEILLANCE ===== -->
+        <article class="report-card">
+          <div class="rc-stamp-wrap" aria-hidden="true">
+            <span class="rc-stamp">CONFIDENTIEL</span>
+          </div>
+          <div class="rc-top">
+            <span class="rc-ref">M-207/C-AS/AMI</span>
+            <span class="rc-date">émis le 13 juin 2026</span>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-type"><i class="ico-pdf" aria-hidden="true"></i>PDF</span>
+            <span class="rc-classif">CONFIDENTIEL · DIFFUSION RESTREINTE</span>
+          </div>
+          <h3 class="rc-titre">RAPPORT DE SURVEILLANCE</h3>
+          <!-- === ZONE ÉDITABLE : description courte du rapport de surveillance === -->
+          <p class="rc-extrait">
+            Surveillance générale du 212e Bataillon sur mandat de l'Amirauté : commandement
+            (CMDM 2224 « Cody »), encadrement (CD-L 9771 « Airo ») et effectifs (unité « Zouro »).
+            Relevés de connexion, historique réglementaire, registre disciplinaire, interceptions
+            et sources internes. Rédacteur : Cne A. Stauffenberg.
+          </p>
+          <div class="rc-actions">
+            <a class="rc-btn rc-btn-dl" href="rapports/Rapport_Surveillance_212e_BRS.pdf.enc" download data-beep>
+              <i class="ico-pdf" aria-hidden="true"></i> TÉLÉCHARGER (PDF)
+            </a>
+            <button class="rc-btn rc-btn-view" data-pdf="rapports/Rapport_Surveillance_212e_BRS.pdf.enc" data-title="RAPPORT DE SURVEILLANCE M-207/C-AS/AMI" data-beep>
+              CONSULTER &rsaquo;
+            </button>
+          </div>
+        </article>
+
+        <!-- ===== CARTE 2 : RAPPORT FINAL ===== -->
+        <article class="report-card">
+          <div class="rc-stamp-wrap" aria-hidden="true">
+            <span class="rc-stamp">CONFIDENTIEL</span>
+          </div>
+          <div class="rc-top">
+            <span class="rc-ref">M-207/C-AS/AMI-F</span>
+            <span class="rc-date">émis le 22 juin 2026</span>
+          </div>
+          <div class="rc-tags">
+            <span class="rc-type"><i class="ico-pdf" aria-hidden="true"></i>PDF</span>
+            <span class="rc-classif">CONFIDENTIEL · DIFFUSION RESTREINTE</span>
+          </div>
+          <h3 class="rc-titre">RAPPORT FINAL</h3>
+          <!-- === ZONE ÉDITABLE : description du rapport final === -->
+          <p class="rc-extrait">
+            Rapport complémentaire : synthèse et clôture de la mission de surveillance du
+            212e Bataillon. Fait suite au rapport de surveillance M-207/C-AS/AMI et consigne
+            l'évaluation d'ensemble de l'unité.
+          </p>
+          <div class="rc-actions">
+            <a class="rc-btn rc-btn-dl" href="rapports/Rapport_Final_212e_BRS.pdf.enc" download data-beep>
+              <i class="ico-pdf" aria-hidden="true"></i> TÉLÉCHARGER (PDF)
+            </a>
+            <button class="rc-btn rc-btn-view" data-pdf="rapports/Rapport_Final_212e_BRS.pdf.enc" data-title="RAPPORT FINAL M-207/C-AS/AMI-F" data-beep>
+              CONSULTER &rsaquo;
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- BARRE LATÉRALE HUD -->
+    <aside class="hud-sidebar">
+      
+      <!-- OSCILLOSCOPE DE RÉSEAU -->
+      <section class="panel sidebar-panel">
+        <h4 class="sp-title">[ OSCILLOSCOPE DE LIAISON ]</h4>
+        <div class="osc-wrap">
+          <canvas id="oscilloscope" aria-hidden="true"></canvas>
+        </div>
+        <div class="osc-telemetry">
+          <div class="osct-row"><span>RELAIS HOLONET:</span> <b id="oscRelay">GAR-RELAIS-C7</b></div>
+          <div class="osct-row"><span>QUALITÉ SIGNAL:</span> <b id="oscSignal">98.4%</b></div>
+          <div class="osct-row"><span>PING COMLINK:</span> <b id="oscPing">42ms</b></div>
+        </div>
+      </section>
+
+      <!-- TERMINAL CONSOLE -->
+      <section class="panel sidebar-panel sp-console">
+        <h4 class="sp-title">[ CONSOLE INTERACTIVE ]</h4>
+        <div class="console-box">
+          <div class="console-history" id="consoleHistory">
+            <div class="con-line dim">> Terminal sécurisé prêt. Accès Niveau 4.</div>
+            <div class="con-line dim">> Taper 'help' pour lister les directives.</div>
+          </div>
+          <div class="console-input-wrap">
+            <span class="console-prompt">&gt;</span>
+            <input type="text" id="consoleInput" placeholder="Saisir directive..." autocomplete="off" spellcheck="false" aria-label="Console de commande" />
+          </div>
+        </div>
+      </section>
+
+      <!-- FLUX LIVE COMLINK -->
+      <section class="panel sidebar-panel sp-feed">
+        <h4 class="sp-title">[ ENREGISTREUR DE FLUX BRS ]</h4>
+        <div class="feed-box" id="feedBox">
+          <div class="feed-line">SYS: COMLINK INITIALISÉ</div>
+          <div class="feed-line">SECURE_LINK: RELAIS CRYPTO ACTIF</div>
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <!-- ---------- FOOTER ---------- -->
+  <footer class="hud-footer">
+    <span class="foot-mono">© <span id="year"></span> B.R.S. — BUREAU DU RENSEIGNEMENT SÉNATORIAL — MISSION 207</span>
+    <span class="foot-mono crypt">TRANSMISSION CHIFFRÉE — CONFIDENTIEL</span>
+    <span class="eq" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </span>
+  </footer>
+
+  <!-- ---------- MODALE LECTEUR PDF HOLOGRAPHIQUE ---------- -->
+  <div id="pdfModal" class="pdf-modal hidden" aria-hidden="true" role="dialog" aria-label="Lecteur de rapports sécurisé">
+    <div class="pdf-modal-overlay" id="pdfModalOverlay"></div>
+    <div class="pdf-modal-container">
+      <span class="bracket tl" aria-hidden="true"></span>
+      <span class="bracket tr" aria-hidden="true"></span>
+      <span class="bracket bl" aria-hidden="true"></span>
+      <span class="bracket br" aria-hidden="true"></span>
+      
+      <div class="pdf-modal-header">
+        <div class="pmh-left">
+          <span class="pmh-tag">B.R.S. // ACCÈS DOCUMENT SECURE</span>
+          <h2 id="pdfModalTitle" class="pmh-title">CHARGEMENT DU DOCUMENT...</h2>
+        </div>
+        <div class="pmh-actions">
+          <a id="pdfModalOpenExternal" class="pmh-btn" href="#" target="_blank" rel="noopener" title="Ouvrir dans un nouvel onglet">
+            PLEIN ÉCRAN ↗
+          </a>
+          <button id="pdfModalClose" class="pmh-btn pmh-btn-close" type="button">FERMER</button>
+        </div>
+      </div>
+      
+      <div class="pdf-modal-body">
+        <div class="pdf-loader" id="pdfLoader">
+          <div class="loader-scanner"></div>
+          <p class="loader-text">DÉCHIFFREMENT DU LIEN SÉCURISÉ BRS...</p>
+        </div>
+        <iframe id="pdfFrame" src="" style="width:100%; height:100%; display:none; border:none;"></iframe>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================================================= -->
+<!-- OVERLAY DE TÉLÉCHARGEMENT (animation avant le download réel)    -->
+<!-- ============================================================= -->
+<div id="dlOverlay" class="dl-overlay hidden" role="dialog" aria-modal="true" aria-label="Téléchargement en cours">
+  <div class="dl-box">
+    <p class="dl-tag">B.R.S. // TRANSFERT SÉCURISÉ</p>
+    <p class="dl-file" id="dlFile">—</p>
+    <div class="dl-bar"><i id="dlBar"></i></div>
+    <div class="dl-meta"><span id="dlStatus">connexion…</span><span id="dlPct">0%</span></div>
+  </div>
+</div>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
