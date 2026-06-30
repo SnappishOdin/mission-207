@@ -1,12 +1,4 @@
-/* =====================================================================
-   B.R.S. // MISSION 207 · Terminal de consultation (2 rapports)
-   Feuille de style unique. Vanilla, self-contained, zéro dépendance.
-   REPRISE INTÉGRALE du langage visuel du site « enquete » (VISOR HUD) :
-   palette, polices, scanlines + vignette + flash, starfield, panneaux
-   « glass », équerres crosshair, intro/amorçage, footer equalizer.
-   Le contenu de jeu (liste dynamique, recherche, lecteur, révélation,
-   table d'effectif) a été retiré : il reste deux cartes-rapport PDF.
-   ===================================================================== */
+
 
 :root{
   --void:#05070B; --hull:#0B0E14; --gunmetal:#2A2F38; --steel:#8A95A6;
@@ -32,7 +24,6 @@ img{display:block}
 .nojs h1{font-family:var(--font-display);color:var(--cyan)}
 .nojs p{max-width:46ch;color:var(--steel);font-family:var(--font-mono);font-size:.85rem}
 
-/* ============== COUCHES DE FOND ============== */
 #starfield{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;background:var(--void)}
 #scanlines{position:fixed;inset:0;z-index:60;pointer-events:none;
   background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.16) 3px,rgba(0,0,0,0) 4px);
@@ -43,12 +34,10 @@ img{display:block}
 #flash{position:fixed;inset:0;z-index:90;pointer-events:none;background:#fff;opacity:0;transition:opacity .12s ease}
 #flash.go{opacity:1;transition:none}
 
-/* ============== ÉCRANS PLEIN-CADRE ============== */
 .screen{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center}
 .hidden{display:none !important}
 [hidden]{display:none !important}
 
-/* BEAT 0 : amorçage */
 .screen-boot{flex-direction:column;background:rgba(5,7,11,.78)}
 .boot-inner{text-align:center;padding:1.5rem;animation:fadeIn .6s ease}
 .boot-tag{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.34em;color:var(--cyan);
@@ -74,7 +63,6 @@ img{display:block}
 .btn-init .btn-sub{font-family:var(--font-body);font-weight:500;font-size:.7rem;letter-spacing:.1em;color:var(--steel)}
 .boot-hint{margin-top:1.6rem;font-size:.78rem;color:var(--steel);max-width:34ch;margin-inline:auto}
 
-/* INTRO session */
 .screen-session{flex-direction:column;align-items:stretch;justify-content:center;background:rgba(5,7,11,.9);overflow:hidden}
 #codeRain{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.55;
   -webkit-mask-image:radial-gradient(ellipse 82% 78% at 50% 50%,#000 32%,transparent 92%);
@@ -96,7 +84,6 @@ img{display:block}
 .session-caret{align-self:flex-start;width:.62em;height:1.05em;margin-top:.35rem;background:var(--cyan);
   box-shadow:0 0 10px var(--cyan);animation:blink 1s steps(1) infinite}
 
-/* TAMPON intro (DOSSIER OUVERT) */
 .granted{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;text-align:center}
 .granted.go{animation:grantedShake .5s ease}
 @keyframes grantedShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-4px,3px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(2px,2px)}}
@@ -114,7 +101,6 @@ img{display:block}
   background:rgba(5,7,11,.6);transition:.2s}
 .btn-skip:hover{color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px rgba(33,230,255,.4)}
 
-/* ============== TERMINAL HUD ============== */
 .hud{position:relative;z-index:10;max-width:1240px;margin:0 auto;padding:1rem clamp(.8rem,3vw,2rem) 4rem;animation:hudOn .6s ease}
 @keyframes hudOn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:none}}
 
@@ -125,7 +111,6 @@ img{display:block}
 .bracket.br{bottom:14px;right:14px;border-width:0 2px 2px 0}
 @keyframes bracketPulse{50%{border-color:var(--red);box-shadow:0 0 14px rgba(225,29,42,.5)}}
 
-/* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.7rem 1rem;
   margin-bottom:1rem;border-radius:8px;background:var(--glass);border:1px solid var(--glass-brd);backdrop-filter:blur(8px)}
 .topbar-left{display:flex;align-items:center;gap:.7rem}
@@ -145,18 +130,15 @@ img{display:block}
 .btn-mute[aria-pressed="true"] .mute-on{display:none}
 .btn-mute[aria-pressed="true"] .mute-off{display:inline;color:var(--plasma)}
 
-/* NAV */
 .hud-nav{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.2rem;font-family:var(--font-display);font-weight:700;font-size:.7rem;letter-spacing:.08em}
 .hud-nav a{padding:.45rem .8rem;border:1px solid transparent;border-radius:4px;color:var(--steel);transition:.18s}
 .hud-nav a:hover{color:var(--cyan);border-color:var(--glass-brd);box-shadow:0 0 12px rgba(33,230,255,.25)}
 #btnReplay{color:var(--plasma)}
 #btnReplay:hover{color:var(--red);border-color:var(--red)}
 
-/* PANEL */
 .panel{background:var(--glass);border:1px solid var(--glass-brd);border-radius:10px;backdrop-filter:blur(8px);
   padding:1.2rem;box-shadow:inset 0 0 40px rgba(10,132,255,.06)}
 
-/* EN-TÊTE DOSSIER */
 .dossier-head{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;margin-bottom:1.2rem;justify-content:space-between}
 .dossier-text{flex:1;min-width:280px}
 .omega-title{position:relative;font-family:var(--font-display);font-weight:900;font-size:clamp(1.6rem,5.5vw,3rem);
@@ -173,7 +155,6 @@ img{display:block}
   text-shadow:0 0 20px rgba(33,230,255,.4)}
 .dossier-count span{font-family:var(--font-mono);font-size:.6rem;color:var(--steel);letter-spacing:.12em}
 
-/* ============== LISTE DES 2 RAPPORTS ============== */
 .reports-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem}
 .report-card{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:.55rem;
   padding:1.2rem 1.3rem;border:1px solid var(--glass-brd);border-radius:10px;
@@ -182,9 +163,8 @@ img{display:block}
 .report-card:hover{transform:translateY(-3px);border-color:var(--cyan);
   box-shadow:0 8px 26px rgba(0,0,0,.45),0 0 18px rgba(33,230,255,.25)}
 
-/* TAMPON rouge « CONFIDENTIEL » en coin de carte */
 .rc-stamp-wrap{position:absolute;inset:0;overflow:hidden;
-  clip-path:inset(0 round 4px);  /* clippe le bandeau pivoté (overflow:hidden seul échoue sur un enfant transformé) */
+  clip-path:inset(0 round 4px);
   pointer-events:none;z-index:3}
 .rc-stamp{position:absolute;top:13px;right:-46px;transform:rotate(45deg);
   width:170px;text-align:center;
@@ -192,7 +172,6 @@ img{display:block}
   padding:.2rem 0;border-top:1px solid var(--red);border-bottom:1px solid var(--red);
   background:rgba(225,29,42,.12);text-shadow:0 0 8px rgba(225,29,42,.6);pointer-events:none;opacity:.92}
 
-/* ============== CHAMP MOT DE PASSE (écran d'amorçage) ============== */
 .pass-field{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin:.4rem 0 1.4rem}
 .pass-input{
   width:min(290px,82vw);text-align:center;
@@ -208,7 +187,6 @@ img{display:block}
   30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
 .boot-inner.shake{animation:shake .5s}
 
-/* ============== OVERLAY DE TÉLÉCHARGEMENT ============== */
 .dl-overlay{position:fixed;inset:0;z-index:140;display:flex;align-items:center;justify-content:center;
   padding:1.2rem;background:rgba(5,7,11,.86);backdrop-filter:blur(5px);animation:fadeIn .2s ease}
 .dl-overlay.hidden{display:none}
@@ -237,7 +215,6 @@ img{display:block}
 .rc-titre{font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:.02em;color:var(--white);line-height:1.2}
 .rc-extrait{font-family:var(--font-body);font-size:.92rem;color:var(--steel);line-height:1.5;flex:1}
 
-/* ICÔNE PDF en CSS pur (petit feuillet coin corné) */
 .ico-pdf{position:relative;display:inline-block;width:11px;height:13px;flex:0 0 auto;
   background:linear-gradient(180deg,rgba(225,29,42,.9),rgba(225,29,42,.55));border-radius:1px;
   box-shadow:0 0 6px rgba(225,29,42,.5)}
@@ -246,7 +223,6 @@ img{display:block}
 .ico-pdf::after{content:"PDF";position:absolute;left:0;right:0;bottom:1px;text-align:center;
   font-family:var(--font-display);font-weight:900;font-size:3.4px;letter-spacing:.02em;color:var(--white)}
 
-/* BOUTONS DE CARTE (télécharger / consulter) */
 .rc-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
 .rc-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-display);font-weight:700;
   font-size:.72rem;letter-spacing:.08em;padding:.6rem .9rem;border-radius:5px;border:1px solid;transition:.18s;cursor:pointer}
@@ -260,7 +236,6 @@ img{display:block}
 .rc-btn-view:hover{transform:translateY(-2px);color:var(--cyan);border-color:var(--cyan);
   box-shadow:0 0 14px rgba(33,230,255,.3)}
 
-/* FOOTER */
 .hud-footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.6rem;
   padding:.8rem 1rem;border-radius:8px;border-top:2px solid;border-image:linear-gradient(90deg,var(--cyan),var(--red)) 1;background:var(--glass)}
 .foot-mono{font-family:var(--font-mono);font-size:.64rem;color:var(--steel)}
@@ -268,7 +243,6 @@ img{display:block}
 .eq{display:flex;align-items:flex-end;gap:2px;height:20px}
 .eq i{width:3px;height:4px;background:var(--cyan);border-radius:1px;transition:height .08s linear}
 
-/* ============== RESPONSIVE ============== */
 @media(max-width:760px){
   .reports-list{grid-template-columns:1fr}
   .topbar-center{order:3;width:100%;gap:.6rem}
@@ -277,7 +251,6 @@ img{display:block}
   .hud-nav{font-size:.62rem}
 }
 
-/* ============== prefers-reduced-motion ============== */
 @media(prefers-reduced-motion:reduce){
   #scanlines{animation:none;opacity:.25}
   .boot-logo,.bracket,.eq i,.link-status .dot{animation:none !important}
@@ -291,16 +264,11 @@ img{display:block}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* =====================================================================
-   SURCHARGES ET STYLES CYBER HUD ÉTENDUS (DASHBOARD & MODALE)
-   ===================================================================== */
-
-/* Grille Cyber structurelle globale */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(33, 230, 255, 0.012) 1px, transparent 1px),
     linear-gradient(90deg, rgba(33, 230, 255, 0.012) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -308,7 +276,6 @@ body::before {
   z-index: 1;
 }
 
-/* Alignement du Dashboard */
 .hud-body {
   display: grid;
   grid-template-columns: 1fr;
@@ -331,7 +298,6 @@ body::before {
   gap: 1.2rem;
 }
 
-/* En-tête de dossier et Cartes Panels stylisés */
 .panel {
   background: linear-gradient(135deg, rgba(7, 16, 30, 0.45) 0%, rgba(10, 30, 46, 0.3) 100%);
   border: 1px solid rgba(33, 230, 255, 0.16);
@@ -381,7 +347,6 @@ body::before {
   50% { box-shadow: 0 0 35px rgba(33, 230, 255, 0.55), inset 0 0 20px rgba(33, 230, 255, 0.15); }
 }
 
-/* SECTION SIDEBAR PANELS */
 .sidebar-panel {
   display: flex;
   flex-direction: column;
@@ -400,7 +365,6 @@ body::before {
   text-shadow: 0 0 8px rgba(33, 230, 255, 0.3);
 }
 
-/* Oscilloscope */
 .osc-wrap {
   height: 100px;
   background: rgba(5, 7, 11, 0.75);
@@ -414,7 +378,7 @@ body::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: 
+  background:
     linear-gradient(rgba(33, 230, 255, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(33, 230, 255, 0.06) 1px, transparent 1px);
   background-size: 16px 16px;
@@ -448,7 +412,6 @@ body::before {
   color: var(--white);
 }
 
-/* Console interactive */
 .console-box {
   background: rgba(5, 7, 11, 0.78);
   border: 1px solid rgba(33, 230, 255, 0.12);
@@ -519,7 +482,6 @@ body::before {
   padding: 0;
 }
 
-/* Enregistreur de Flux */
 .feed-box {
   height: 90px;
   overflow-y: hidden;
@@ -548,7 +510,6 @@ body::before {
   to { opacity: 1; transform: none; }
 }
 
-/* MODALE DU LECTEUR PDF HOLOGRAPHIQUE */
 .pdf-modal {
   position: fixed;
   inset: 0;
@@ -707,7 +668,6 @@ body::before {
   50% { opacity: 0.35; }
 }
 
-/* RESPONSIVE DASHBOARD */
 @media (max-width: 1024px) {
   .hud-body {
     grid-template-columns: 1fr;

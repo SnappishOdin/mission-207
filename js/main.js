@@ -1,36 +1,10 @@
-/* =====================================================================
-   B.R.S. // MISSION 207
-   Terminal de consultation — DOSSIER BRS-207 (2 rapports PDF).
-   main.js — moteur unique, vanilla, sans dépendance.
 
-   REPRISE INTÉGRALE de l'ossature du site « enquete » :
-   moteur audio (Web Audio API), champ d'étoiles <canvas> (parallax + warp),
-   écran d'amorçage, intro « ouverture de session » (pluie de code + lignes
-   de code + barre de déchiffrement + tampon DOSSIER OUVERT + warp), bouton
-   PASSER, son/muet + equalizer, télémétrie, localStorage, reduced-motion,
-   lien REJOUER L'INTRO.
-
-   RETIRÉ par rapport à enquete : la liste dynamique de rapports, la recherche
-   plein-texte, le lecteur modale, la révélation recruteur (Konami) et toute
-   la « solution ». Ici, deux cartes-rapport statiques renvoient vers des PDF.
-
-   Sommaire :
-   1. Utilitaires & état global
-   2. Moteur audio (Web Audio API, 100% synthétique)
-   3. Champ d'étoiles <canvas> (parallax + saut hyperespace)
-   4. Intro : OUVERTURE DE SESSION (lignes de code) -> terminal
-   5. Comportements live (télémétrie, equalizer) + beep des boutons
-   6. Son / rejouer
-   ===================================================================== */
 
 (() => {
 'use strict';
 
 document.body.classList.remove('no-js');
 
-/* =====================================================================
-   1. UTILITAIRES & ÉTAT GLOBAL
-   ===================================================================== */
 const $  = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -42,17 +16,9 @@ const LS_KEY  = 'brs_corsaire_intro_vue';
 
 let soundOn  = true;
 let hudReady = false;
-let accessGranted = false;        // le mot de passe a-t-il été validé ?
-let cryptoKey = null;             // clé AES dérivée du mot de passe (en mémoire après déverrouillage)
+let accessGranted = false;
+let cryptoKey = null;
 
-/* =====================================================================
-   SÉCURITÉ — les PDF sont chiffrés (AES-256-GCM) avec une clé dérivée
-   du mot de passe (PBKDF2). Le mot de passe N'APPARAÎT PAS en clair ici :
-   seul un « témoin » chiffré sert à valider la saisie. Sans le bon code,
-   les fichiers .enc sont inexploitables.
-   (Pour changer le mot de passe ou les PDF, il faut re-chiffrer à partir
-    des PDF d'origine — voir le script d'encryption.)
-   ===================================================================== */
 const SEC = {
   salt: 'cxDU9w5q36kNG/KgIDyr+w==',
   iter: 200000,
@@ -60,7 +26,6 @@ const SEC = {
 };
 const b64ToBuf = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 
-/* dérive la clé AES-GCM depuis le mot de passe saisi (PBKDF2-SHA256) */
 async function deriveKey(pw) {
   const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
@@ -68,11 +33,11 @@ async function deriveKey(pw) {
     base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
   );
 }
-/* déchiffre un buffer « IV(12o) || ciphertext+tag » */
+
 async function decryptBuf(buf, key) {
   return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12)));
 }
-/* tente de déverrouiller : dérive la clé et déchiffre le témoin */
+
 async function tryUnlock(pw) {
   try {
     const key = await deriveKey(pw);
@@ -82,9 +47,6 @@ async function tryUnlock(pw) {
   return false;
 }
 
-/* =====================================================================
-   2. MOTEUR AUDIO — Web Audio API (repris d'enquete, identique)
-   ===================================================================== */
 let AC = null, masterGain = null, analyser = null, freqData = null;
 let droneOsc1 = null, droneOsc2 = null, droneGain = null;
 
@@ -140,23 +102,23 @@ function startDrone() {
     droneGain = AC.createGain();
     droneGain.gain.setValueAtTime(0.0001, AC.currentTime);
     droneGain.gain.linearRampToValueAtTime(0.06, AC.currentTime + 2.0);
-    
+
     droneOsc1 = AC.createOscillator();
     droneOsc1.type = 'sine';
     droneOsc1.frequency.setValueAtTime(55, AC.currentTime);
-    
+
     droneOsc2 = AC.createOscillator();
     droneOsc2.type = 'triangle';
     droneOsc2.frequency.setValueAtTime(55.4, AC.currentTime);
-    
+
     const filter = AC.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(110, AC.currentTime);
-    
+
     droneOsc1.connect(filter);
     droneOsc2.connect(filter);
     filter.connect(droneGain).connect(masterGain);
-    
+
     droneOsc1.start();
     droneOsc2.start();
   } catch (e) {
@@ -186,23 +148,20 @@ function playKeySound() {
     const o = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
     o.type = 'triangle';
     o.frequency.setValueAtTime(rand(900, 1500), AC.currentTime);
-    
+
     f.type = 'highpass';
     f.frequency.setValueAtTime(1000, AC.currentTime);
-    
+
     g.gain.setValueAtTime(0.0001, AC.currentTime);
     g.gain.linearRampToValueAtTime(0.012, AC.currentTime + 0.002);
     g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + 0.025);
-    
+
     o.connect(f).connect(g).connect(masterGain);
     o.start();
     o.stop(AC.currentTime + 0.03);
   } catch (e) {}
 }
 
-/* =====================================================================
-   3. CHAMP D'ÉTOILES <canvas> : parallax + saut hyperespace
-   ===================================================================== */
 const cv  = $('#starfield');
 const ctx = cv.getContext('2d');
 let W, H, stars = [];
@@ -284,10 +243,6 @@ function flash(hold = 0.2, color) {
   setTimeout(() => { f.classList.remove('go'); f.style.background = '#fff'; }, hold * 1000);
 }
 
-/* =====================================================================
-   4. INTRO : OUVERTURE DE SESSION -> TERMINAL DE CONSULTATION
-   (même mécanisme/timing qu'enquete ; lignes thématisées 207)
-   ===================================================================== */
 const scBoot  = $('#screen-boot');
 const scCrawl = $('#screen-crawl');
 const hud     = $('#hud');
@@ -377,20 +332,19 @@ function setStatus(txt, ok) {
 
 $('#btnInit').addEventListener('click', async () => {
   if (accessGranted) return;
-  armAudio();                                   // le clic est un geste utilisateur → arme l'audio
+  armAudio();
   const input = $('#passInput');
   const val = input ? input.value : '';
   const err = $('#passError');
   const btn = $('#btnInit');
 
-  // --- vérification du mot de passe (déchiffre le témoin) ---
   if (err) { err.textContent = 'vérification…'; err.classList.remove('ok'); }
   if (btn) btn.disabled = true;
   const okPw = await tryUnlock(val);
   if (btn) btn.disabled = false;
 
   if (!okPw) {
-    beep(160, 0.18, 'sawtooth', 0.16);          // buzz d'erreur
+    beep(160, 0.18, 'sawtooth', 0.16);
     if (err) { err.textContent = '✕ CODE INCORRECT — ACCÈS REFUSÉ'; err.classList.remove('ok'); }
     const bi = $('.boot-inner');
     if (bi) { bi.classList.remove('shake'); void bi.offsetWidth; bi.classList.add('shake'); }
@@ -398,11 +352,10 @@ $('#btnInit').addEventListener('click', async () => {
     return;
   }
 
-  // --- code accepté : clé en mémoire (cryptoKey) ---
   accessGranted = true;
   if (err) { err.textContent = '✓ CODE ACCEPTÉ'; err.classList.add('ok'); }
   if (input) input.blur();
-  beep(120, 0.25, 'sine', 0.22);                // bip grave d'amorçage
+  beep(120, 0.25, 'sine', 0.22);
   const lg = $('#bootLogo');
   lg.style.transition = 'filter .6s ease, transform .6s ease';
   lg.style.filter = 'drop-shadow(0 0 22px rgba(33,230,255,.8))';
@@ -410,21 +363,20 @@ $('#btnInit').addEventListener('click', async () => {
   setTimeout(() => { lockSound(); flash(0.18); }, 450);
   const returning = localStorage.getItem(LS_KEY) === '1';
   setTimeout(() => {
-    if (hudReady) return;            // l'utilisateur a déjà PASSÉ pendant le délai
+    if (hudReady) return;
     scBoot.classList.add('hidden');
     if (returning) runReturnSession();
     else runSession();
   }, 1000);
 });
 
-/* validation au clavier (Entrée) + focus automatique sur le champ code */
 if ($('#passInput')) {
   $('#passInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#btnInit').click(); } });
   $('#passInput').focus();
 }
 
 $('#btnSkip').addEventListener('click', () => { beep(300, 0.06); enterHud(true); });
-/* Échap passe l'intro (uniquement APRÈS validation du code, sinon la porte ne sert à rien) */
+
 window.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const ov = $('#dlOverlay');
@@ -432,7 +384,6 @@ window.addEventListener('keydown', e => {
   if (accessGranted && !hudReady) enterHud(true);
 });
 
-/* --- intro complète (lignes thématisées MISSION 207) --- */
 async function runSession() {
   if (breachOn) return;
   breachOn = true;
@@ -468,7 +419,6 @@ async function runSession() {
   await sessionOpen();
 }
 
-/* --- intro courte (visite de retour, dossier en cache) --- */
 async function runReturnSession() {
   if (breachOn) return;
   breachOn = true;
@@ -505,7 +455,6 @@ async function reducedOpen() {
   enterHud(false);
 }
 
-/* ---- transition intro -> terminal (warp hyperespace) ---- */
 async function goTerminal() {
   if (hudReady) return;
   scCrawl.classList.add('hidden');
@@ -529,15 +478,11 @@ function enterHud(skipped) {
   initHud();
 }
 
-/* visite de retour : adapte le sous-titre du bouton d'amorçage */
 if (localStorage.getItem(LS_KEY) === '1') {
   const sub = $('.btn-init .btn-sub');
   if (sub) sub.textContent = 'réouverture du dossier 207';
 }
 
-/* =====================================================================
-   5. COMPORTEMENTS LIVE : télémétrie, equalizer, beep des boutons
-   ===================================================================== */
 function initHud() {
   startTelemetry();
   startEqualizer();
@@ -577,20 +522,18 @@ function startEqualizer() {
   frame();
 }
 
-/* petit beep au clic des boutons télécharger / consulter */
 function wireCardButtons() {
   $$('[data-beep]').forEach(btn =>
     btn.addEventListener('click', () => beep(740, 0.06)));
 }
 
-/* === TÉLÉCHARGEMENT : animation + déchiffrement du .enc, puis download forcé === */
 function wireDownloads() {
   $$('.rc-btn-dl').forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
-    const href = a.getAttribute('href');                       // ...pdf.enc
+    const href = a.getAttribute('href');
     if (href) startDownload(href, href.split('/').pop().replace(/\.enc$/i, ''));
   }));
-  // fermeture de l'overlay par clic sur le fond
+
   const ov = $('#dlOverlay');
   if (ov) ov.addEventListener('click', e => { if (e.target === ov) ov.classList.add('hidden'); });
 }
@@ -607,7 +550,6 @@ async function startDownload(encHref, name) {
   status.textContent = 'connexion au coffre B.R.S…';
   beep(660, 0.05);
 
-  // récupère le fichier chiffré puis le DÉCHIFFRE en mémoire (clé issue du mot de passe)
   let blobUrl = null, ok = true;
   const work = (async () => {
     if (!cryptoKey) throw 0;
@@ -616,7 +558,6 @@ async function startDownload(encHref, name) {
     blobUrl = URL.createObjectURL(new Blob([clear], { type: 'application/pdf' }));
   })().catch(() => { ok = false; });
 
-  // animation de la barre
   const steps = [
     [12, 'authentification de l’agent…'],
     [34, 'déchiffrement du document…'],
@@ -637,7 +578,7 @@ async function startDownload(encHref, name) {
     beep(160, 0.18, 'sawtooth', 0.14);
     await delay(1600); ov.classList.add('hidden'); dlBusy = false; return;
   }
-  // téléchargement forcé du PDF déchiffré
+
   const t = document.createElement('a');
   t.href = blobUrl; t.download = name;
   document.body.appendChild(t); t.click(); t.remove();
@@ -653,7 +594,7 @@ function initOscilloscope() {
   const ctx = canvas.getContext('2d');
   let width = canvas.width = canvas.parentElement.clientWidth;
   let height = canvas.height = canvas.parentElement.clientHeight || 100;
-  
+
   window.addEventListener('resize', () => {
     if (canvas.parentElement) {
       width = canvas.width = canvas.parentElement.clientWidth;
@@ -664,18 +605,18 @@ function initOscilloscope() {
   const bufferLength = analyser ? analyser.frequencyBinCount : 32;
   const timeData = new Uint8Array(bufferLength);
   let phase = 0;
-  
+
   function draw() {
     if (!hudReady) return;
     requestAnimationFrame(draw);
-    
+
     ctx.clearRect(0, 0, width, height);
     ctx.strokeStyle = 'rgba(33, 230, 255, 0.85)';
     ctx.lineWidth = 2;
     ctx.shadowBlur = 4;
     ctx.shadowColor = 'rgba(33, 230, 255, 0.6)';
     ctx.beginPath();
-    
+
     if (analyser && soundOn) {
       analyser.getByteTimeDomainData(timeData);
       const sliceWidth = width / bufferLength;
@@ -693,8 +634,8 @@ function initOscilloscope() {
       let x = 0;
       for (let i = 0; i <= 100; i++) {
         const amp = height * 0.25;
-        const y = (height / 2) + 
-                  Math.sin(i * 0.15 - phase) * amp + 
+        const y = (height / 2) +
+                  Math.sin(i * 0.15 - phase) * amp +
                   Math.cos(i * 0.05 + phase * 0.5) * (amp * 0.3);
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
@@ -704,7 +645,7 @@ function initOscilloscope() {
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
-  
+
   draw();
 }
 
@@ -712,7 +653,7 @@ function initConsole() {
   const input = $('#consoleInput');
   const history = $('#consoleHistory');
   if (!input || !history) return;
-  
+
   function printLine(text, type = 'dim') {
     const div = document.createElement('div');
     div.className = `con-line ${type}`;
@@ -720,7 +661,7 @@ function initConsole() {
     history.appendChild(div);
     history.scrollTop = history.scrollHeight;
   }
-  
+
   async function printLinesSlow(lines, type = 'dim') {
     input.disabled = true;
     for (const line of lines) {
@@ -737,17 +678,17 @@ function initConsole() {
       const rawCmd = input.value.trim();
       input.value = '';
       if (!rawCmd) return;
-      
+
       playKeySound();
       printLine(`> ${rawCmd}`, 'info');
-      
+
       const cmd = rawCmd.toLowerCase();
-      
+
       if (cmd === 'clear') {
         history.innerHTML = '';
         return;
       }
-      
+
       if (cmd === 'help') {
         printLine("DIRECTIVES ACCESSIBLES :", "warn");
         printLine("- help      : Liste des directives du terminal.", "dim");
@@ -761,7 +702,7 @@ function initConsole() {
         printLine("- clear     : Efface l'historique de la console.", "dim");
         return;
       }
-      
+
       if (cmd === 'status') {
         await printLinesSlow([
           "Lancement du diagnostic global...",
@@ -773,7 +714,7 @@ function initConsole() {
         ], "ok");
         return;
       }
-      
+
       if (cmd === 'logs') {
         printLine("LOGS DE TRANSMISSION RÉCENTS :", "warn");
         const t = new Date();
@@ -785,7 +726,7 @@ function initConsole() {
         printLine(`[${timeStr()}] Prêt pour consultation sécurisée.`, "ok");
         return;
       }
-      
+
       if (cmd === 'clearance') {
         printLine("DÉTAIL D'ACCRÉDITATION :", "warn");
         printLine("  GRADE : Agent Spécialisé B.R.S.", "dim");
@@ -795,18 +736,18 @@ function initConsole() {
         beep(900, 0.08, 'square', 0.08);
         return;
       }
-      
+
       if (cmd === 'decrypt') {
         input.disabled = true;
         printLine("Test de clé de chiffrement...", "info");
         beep(440, 0.1, 'sine', 0.1);
         await delay(500);
-        
+
         const WB = 15;
         const lineDiv = document.createElement('div');
         lineDiv.className = 'con-line dim';
         history.appendChild(lineDiv);
-        
+
         for (let p = 0; p <= 100; p += 10) {
           const fill = Math.round(WB * p / 100);
           lineDiv.textContent = `  Décryptage Holonet [${'█'.repeat(fill)}${'░'.repeat(WB - fill)}] ${p}%`;
@@ -814,13 +755,13 @@ function initConsole() {
           beep(600 + p*2, 0.03, 'sine', 0.04);
           await delay(100);
         }
-        
+
         printLine("Clé Holonet validée. Liaison 100% sécurisée.", "ok");
         input.disabled = false;
         input.focus();
         return;
       }
-      
+
       if (cmd === 'cody') {
         printLine("DOSSIER CODEX // CC-2224 \"CODY\"", "warn");
         printLine("  FONCTION : Commandant Clone du 212e Bataillon", "dim");
@@ -828,7 +769,7 @@ function initConsole() {
         printLine("  RAPPORTS BRS : R.A.S. Tactique militaire irréprochable.", "dim");
         return;
       }
-      
+
       if (cmd === 'airo') {
         printLine("DOSSIER CODEX // CD-L 9771 \"AIRO\"", "warn");
         printLine("  FONCTION : Officier de Liaison BRS", "dim");
@@ -836,7 +777,7 @@ function initConsole() {
         printLine("  STATUT : Actif. Transmission du dossier en cours.", "dim");
         return;
       }
-      
+
       if (cmd === 'zouro') {
         printLine("DOSSIER CODEX // COMPAGNIE ZOURO", "warn");
         printLine("  UNITÉ : Compagnie Zouro (212e Bataillon)", "dim");
@@ -844,7 +785,7 @@ function initConsole() {
         printLine("  SURVEILLANCE BRS : Communications infiltrées.", "dim");
         return;
       }
-      
+
       printLine(`Directives '${rawCmd}' non reconnues.`, 'err');
       printLine("Taper 'help' pour la liste des directives.", 'dim');
       beep(180, 0.15, 'sawtooth', 0.12);
@@ -855,7 +796,7 @@ function initConsole() {
 function initLiveFeed() {
   const feed = $('#feedBox');
   if (!feed) return;
-  
+
   const logPool = [
     "SYS: COMLINK ACTIF",
     "COMLINK: PACKET INCOMING...",
@@ -872,18 +813,18 @@ function initLiveFeed() {
     "BRS: INTERCEPTION FLUX COD Cody",
     "COMLINK: LIAISON DU CONVOI EN COURS"
   ];
-  
+
   setInterval(() => {
     if (!hudReady) return;
     const txt = logPool[Math.floor(rand(0, logPool.length))];
     const t = new Date();
     const timeStr = `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
-    
+
     const div = document.createElement('div');
     div.className = 'feed-line';
     div.textContent = `[${timeStr}] ${txt}`;
     feed.appendChild(div);
-    
+
     while (feed.children.length > 5) {
       feed.removeChild(feed.firstChild);
     }
@@ -898,22 +839,22 @@ function initPdfModal() {
   const frame = $('#pdfFrame');
   const loader = $('#pdfLoader');
   const openExternal = $('#pdfModalOpenExternal');
-  
+
   if (!modal || !closeBtn || !frame || !loader) return;
   let curBlobUrl = null;
-  
+
   $$('.rc-btn-view').forEach(btn => {
     btn.addEventListener('click', async () => {
       const encUrl = btn.getAttribute('data-pdf');
       const docTitle = btn.getAttribute('data-title');
-      
+
       title.textContent = docTitle;
       frame.style.display = 'none';
       loader.style.display = 'flex';
-      
+
       modal.classList.remove('hidden');
       modal.setAttribute('aria-hidden', 'false');
-      
+
       beep(440, 0.12, 'sine', 0.15);
       setTimeout(() => beep(660, 0.1, 'sine', 0.12), 80);
 
@@ -932,13 +873,13 @@ function initPdfModal() {
       }
     });
   });
-  
+
   frame.addEventListener('load', () => {
     loader.style.display = 'none';
     frame.style.display = 'block';
     beep(880, 0.08, 'sine', 0.1);
   });
-  
+
   function closeModal() {
     modal.classList.add('hidden');
     modal.setAttribute('aria-hidden', 'true');
@@ -946,10 +887,10 @@ function initPdfModal() {
     if (curBlobUrl) { URL.revokeObjectURL(curBlobUrl); curBlobUrl = null; }
     beep(330, 0.1, 'sine', 0.1);
   }
-  
+
   closeBtn.addEventListener('click', closeModal);
   overlay.addEventListener('click', closeModal);
-  
+
   window.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
       closeModal();
@@ -957,9 +898,6 @@ function initPdfModal() {
   });
 }
 
-/* =====================================================================
-   6. SON / REJOUER
-   ===================================================================== */
 $('#btnMute').addEventListener('click', e => {
   soundOn = !soundOn;
   e.currentTarget.setAttribute('aria-pressed', String(!soundOn));
@@ -974,7 +912,7 @@ $('#btnMute').addEventListener('click', e => {
 
 $('#btnLogout').addEventListener('click', e => {
   e.preventDefault();
-  location.reload();   // déconnexion : retour à l'écran de code d'accès
+  location.reload();
 });
 
 })();

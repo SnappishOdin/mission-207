@@ -6,7 +6,6 @@
 <meta name="description" content="B.R.S. // MISSION 207 — Terminal de consultation : rapports de surveillance du 212e Bataillon (mandat de l'Amirauté)." />
 <title>B.R.S. // MISSION 207 · Rapports</title>
 
-<!-- ========= POLICES GOOGLE FONTS (seule ressource externe hors logo) ========= -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
@@ -16,7 +15,6 @@
 </head>
 <body class="no-js">
 
-<!-- no-js fallback -->
 <noscript>
   <div class="nojs">
     <h1>MISSION 207</h1>
@@ -24,17 +22,11 @@
   </div>
 </noscript>
 
-<!-- ============================================================= -->
-<!-- FONDS GLOBAUX : starfield + scanlines + vignette + flash       -->
-<!-- ============================================================= -->
 <canvas id="starfield" aria-hidden="true"></canvas>
 <div id="scanlines" aria-hidden="true"></div>
 <div id="vignette" aria-hidden="true"></div>
 <div id="flash" aria-hidden="true"></div>
 
-<!-- ============================================================= -->
-<!-- BEAT 0 : ÉCRAN D'AMORÇAGE (arme l'AudioContext via le clic)    -->
-<!-- ============================================================= -->
 <section id="screen-boot" class="screen screen-boot" aria-label="Ouverture du dossier 207">
   <div class="boot-inner">
     <p class="boot-tag" aria-hidden="true">VISOR // DOSSIER CHIFFRÉ — 207</p>
@@ -52,9 +44,6 @@
   </div>
 </section>
 
-<!-- ============================================================= -->
-<!-- INTRO : OUVERTURE DE SESSION (pluie de code + lignes de code)  -->
-<!-- ============================================================= -->
 <section id="screen-crawl" class="screen screen-session hidden" aria-label="Déchiffrement du dossier">
   <canvas id="codeRain" aria-hidden="true"></canvas>
   <div class="session-wrap" id="breachWrap">
@@ -73,9 +62,6 @@
   <button id="btnSkip" class="btn-skip" type="button">PASSER L'INTRO &raquo;</button>
 </section>
 
-<!-- ============================================================= -->
-<!-- TERMINAL DE CONSULTATION — DOSSIER 207                     -->
-<!-- ============================================================= -->
 <main id="hud" class="hud hidden" aria-label="Terminal de consultation 207">
 
   <span class="bracket tl" aria-hidden="true"></span>
@@ -83,7 +69,6 @@
   <span class="bracket bl" aria-hidden="true"></span>
   <span class="bracket br" aria-hidden="true"></span>
 
-  <!-- ---------- TOPBAR ---------- -->
   <header class="topbar">
     <div class="topbar-left">
       <img src="logobrs.png" alt="Sceau B.R.S." class="seal" />
@@ -106,23 +91,20 @@
     </div>
   </header>
 
-  <!-- ---------- NAV ---------- -->
   <nav class="hud-nav" aria-label="Navigation">
     <a href="#rapports" data-nav>RAPPORTS</a>
     <a href="#" id="btnLogout" data-nav>SE DÉCONNECTER</a>
   </nav>
 
-  <!-- ---------- DASHBOARD BODY ---------- -->
   <div class="hud-body">
-    
-    <!-- CONTENU PRINCIPAL (DOSSIER & CARTES) -->
+
     <div class="hud-content">
-      <!-- ---------- EN-TÊTE DOSSIER ---------- -->
+
       <section id="rapports" class="panel dossier-head">
         <div class="dossier-text">
           <h1 class="omega-title" data-text="MISSION 207">MISSION 207</h1>
           <p class="dossier-sub">DOSSIER M-207 — CONFIDENTIEL · DIFFUSION RESTREINTE (AMIRAUTÉ)</p>
-          <!-- === ZONE ÉDITABLE : paragraphe de contexte de la mission === -->
+
           <p class="dossier-brief">
             Sur mandat de l'Amirauté, le B.R.S a placé le <b>212e Bataillon</b> sous
             <b>surveillance générale</b> — commandement, encadrement et effectifs. Les
@@ -135,10 +117,8 @@
         </div>
       </section>
 
-      <!-- ---------- LES 2 CARTES-RAPPORT ---------- -->
       <div class="reports-list">
 
-        <!-- ===== CARTE 1 : RAPPORT DE SURVEILLANCE ===== -->
         <article class="report-card">
           <div class="rc-stamp-wrap" aria-hidden="true">
             <span class="rc-stamp">CONFIDENTIEL</span>
@@ -152,7 +132,7 @@
             <span class="rc-classif">CONFIDENTIEL · DIFFUSION RESTREINTE</span>
           </div>
           <h3 class="rc-titre">RAPPORT DE SURVEILLANCE</h3>
-          <!-- === ZONE ÉDITABLE : description courte du rapport de surveillance === -->
+
           <p class="rc-extrait">
             Surveillance générale du 212e Bataillon sur mandat de l'Amirauté : commandement
             (CMDM 2224 « Cody »), encadrement (CD-L 9771 « Airo ») et effectifs (unité « Zouro »).
@@ -169,7 +149,6 @@
           </div>
         </article>
 
-        <!-- ===== CARTE 2 : RAPPORT FINAL ===== -->
         <article class="report-card">
           <div class="rc-stamp-wrap" aria-hidden="true">
             <span class="rc-stamp">CONFIDENTIEL</span>
@@ -183,7 +162,7 @@
             <span class="rc-classif">CONFIDENTIEL · DIFFUSION RESTREINTE</span>
           </div>
           <h3 class="rc-titre">RAPPORT FINAL</h3>
-          <!-- === ZONE ÉDITABLE : description du rapport final === -->
+
           <p class="rc-extrait">
             Rapport complémentaire : synthèse et clôture de la mission de surveillance du
             212e Bataillon. Fait suite au rapport de surveillance M-207/C-AS/AMI et consigne
@@ -202,10 +181,8 @@
       </div>
     </div>
 
-
   </div>
 
-  <!-- ---------- FOOTER ---------- -->
   <footer class="hud-footer">
     <span class="foot-mono">© <span id="year"></span> B.R.S. — BUREAU DU RENSEIGNEMENT SÉNATORIAL — MISSION 207</span>
     <span class="foot-mono crypt">TRANSMISSION CHIFFRÉE — CONFIDENTIEL</span>
@@ -214,7 +191,6 @@
     </span>
   </footer>
 
-  <!-- ---------- MODALE LECTEUR PDF HOLOGRAPHIQUE ---------- -->
   <div id="pdfModal" class="pdf-modal hidden" aria-hidden="true" role="dialog" aria-label="Lecteur de rapports sécurisé">
     <div class="pdf-modal-overlay" id="pdfModalOverlay"></div>
     <div class="pdf-modal-container">
@@ -222,7 +198,7 @@
       <span class="bracket tr" aria-hidden="true"></span>
       <span class="bracket bl" aria-hidden="true"></span>
       <span class="bracket br" aria-hidden="true"></span>
-      
+
       <div class="pdf-modal-header">
         <div class="pmh-left">
           <span class="pmh-tag">B.R.S. // ACCÈS DOCUMENT SECURE</span>
@@ -235,7 +211,7 @@
           <button id="pdfModalClose" class="pmh-btn pmh-btn-close" type="button">FERMER</button>
         </div>
       </div>
-      
+
       <div class="pdf-modal-body">
         <div class="pdf-loader" id="pdfLoader">
           <div class="loader-scanner"></div>
@@ -248,9 +224,6 @@
 
 </main>
 
-<!-- ============================================================= -->
-<!-- OVERLAY DE TÉLÉCHARGEMENT (animation avant le download réel)    -->
-<!-- ============================================================= -->
 <div id="dlOverlay" class="dl-overlay hidden" role="dialog" aria-modal="true" aria-label="Téléchargement en cours">
   <div class="dl-box">
     <p class="dl-tag">B.R.S. // TRANSFERT SÉCURISÉ</p>
