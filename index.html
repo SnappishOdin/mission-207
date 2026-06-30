@@ -109,7 +109,7 @@
   <!-- ---------- NAV ---------- -->
   <nav class="hud-nav" aria-label="Navigation">
     <a href="#rapports" data-nav>RAPPORTS</a>
-    <a href="#" id="btnReplay" data-nav>&#9658; REJOUER L'INTRO</a>
+    <a href="#" id="btnLogout" data-nav>SE DÉCONNECTER</a>
   </nav>
 
   <!-- ---------- DASHBOARD BODY ---------- -->
@@ -202,47 +202,6 @@
       </div>
     </div>
 
-    <!-- BARRE LATÉRALE HUD -->
-    <aside class="hud-sidebar">
-      
-      <!-- OSCILLOSCOPE DE RÉSEAU -->
-      <section class="panel sidebar-panel">
-        <h4 class="sp-title">[ OSCILLOSCOPE DE LIAISON ]</h4>
-        <div class="osc-wrap">
-          <canvas id="oscilloscope" aria-hidden="true"></canvas>
-        </div>
-        <div class="osc-telemetry">
-          <div class="osct-row"><span>RELAIS HOLONET:</span> <b id="oscRelay">GAR-RELAIS-C7</b></div>
-          <div class="osct-row"><span>QUALITÉ SIGNAL:</span> <b id="oscSignal">98.4%</b></div>
-          <div class="osct-row"><span>PING COMLINK:</span> <b id="oscPing">42ms</b></div>
-        </div>
-      </section>
-
-      <!-- TERMINAL CONSOLE -->
-      <section class="panel sidebar-panel sp-console">
-        <h4 class="sp-title">[ CONSOLE INTERACTIVE ]</h4>
-        <div class="console-box">
-          <div class="console-history" id="consoleHistory">
-            <div class="con-line dim">> Terminal sécurisé prêt. Accès Niveau 4.</div>
-            <div class="con-line dim">> Taper 'help' pour lister les directives.</div>
-          </div>
-          <div class="console-input-wrap">
-            <span class="console-prompt">&gt;</span>
-            <input type="text" id="consoleInput" placeholder="Saisir directive..." autocomplete="off" spellcheck="false" aria-label="Console de commande" />
-          </div>
-        </div>
-      </section>
-
-      <!-- FLUX LIVE COMLINK -->
-      <section class="panel sidebar-panel sp-feed">
-        <h4 class="sp-title">[ ENREGISTREUR DE FLUX BRS ]</h4>
-        <div class="feed-box" id="feedBox">
-          <div class="feed-line">SYS: COMLINK INITIALISÉ</div>
-          <div class="feed-line">SECURE_LINK: RELAIS CRYPTO ACTIF</div>
-        </div>
-      </section>
-
-    </aside>
 
   </div>
 

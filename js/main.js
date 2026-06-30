@@ -543,9 +543,6 @@ function initHud() {
   startEqualizer();
   wireCardButtons();
   wireDownloads();
-  initOscilloscope();
-  initConsole();
-  initLiveFeed();
   initPdfModal();
   $('#cRapports').textContent = '02';
   $('#year').textContent = new Date().getFullYear();
@@ -975,10 +972,9 @@ $('#btnMute').addEventListener('click', e => {
   }
 });
 
-$('#btnReplay').addEventListener('click', e => {
+$('#btnLogout').addEventListener('click', e => {
   e.preventDefault();
-  localStorage.removeItem(LS_KEY);
-  location.reload();
+  location.reload();   // déconnexion : retour à l'écran de code d'accès
 });
 
 })();
