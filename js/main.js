@@ -20,9 +20,9 @@ let accessGranted = false;
 let cryptoKey = null;
 
 const SEC = {
-  salt: 'cxDU9w5q36kNG/KgIDyr+w==',
+  salt: 'kAeokj2J/C2VvTs23qXCMg==',
   iter: 200000,
-  sentinel: '9lJcZg5fS7ZxpipjRT610XZ9eQohmV8Vw9p3CCvIRGD+jg=='
+  sentinel: 'vFvyVPeTOOMRG6TzSvBlZ5s5pSKp3EVzsQxpUGeeUTeR+w=='
 };
 const b64ToBuf = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 
