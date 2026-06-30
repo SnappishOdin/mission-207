@@ -361,12 +361,10 @@ $('#btnInit').addEventListener('click', async () => {
   lg.style.filter = 'drop-shadow(0 0 22px rgba(33,230,255,.8))';
   lg.style.transform = 'scale(1.06)';
   setTimeout(() => { lockSound(); flash(0.18); }, 450);
-  const returning = localStorage.getItem(LS_KEY) === '1';
   setTimeout(() => {
     if (hudReady) return;
     scBoot.classList.add('hidden');
-    if (returning) runReturnSession();
-    else runSession();
+    runSession();
   }, 1000);
 });
 
@@ -476,11 +474,6 @@ function enterHud(skipped) {
   if (!skipped) bootSequence();
   if (soundOn) startDrone();
   initHud();
-}
-
-if (localStorage.getItem(LS_KEY) === '1') {
-  const sub = $('.btn-init .btn-sub');
-  if (sub) sub.textContent = 'réouverture du dossier 207';
 }
 
 function initHud() {
