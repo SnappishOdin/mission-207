@@ -482,7 +482,7 @@ function initHud() {
   wireCardButtons();
   wireDownloads();
   initPdfModal();
-  $('#cRapports').textContent = '02';
+  $('#cRapports').textContent = String($$('.report-card').length).padStart(2, '0');
   $('#year').textContent = new Date().getFullYear();
 }
 
