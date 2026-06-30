@@ -914,87 +914,77 @@ let indianOn = false;
 let indianAudio = null;
 
 const TOURISTA = [
-  { t: 'initialisation du radar tourista', k: 'init' },
-  { t: 'cheese naan localisé', k: 'ok' },
-  { t: 'poulet tikka massala : coordonnées acquises', k: 'ok' },
-  { t: 'samosa chaud détecté (croustillant confirmé)', k: 'ok' },
-  { t: 'lassi mangue : stock validé', k: 'ok' },
-  { t: 'biryani géolocalisé à 200 m', k: 'ok' },
-  { t: 'tuk-tuk en approche — tarif négocié', k: 'ok' },
-  { t: 'vache sacrée sur la voie : contournement', k: 'warn' },
-  { t: 'klaxon calibré à 128 dB', k: 'ok' },
-  { t: 'Taj Mahal indexé en haute résolution', k: 'ok' },
-  { t: 'thé masala chai infusé', k: 'ok' },
-  { t: 'chorégraphie Bollywood synchronisée', k: 'ok' },
-  { t: 'MISSION TOURISTA : SUCCÈS — NAMASTÉ', k: 'final' },
+  'cheese naan localisé ✓',
+  'poulet tikka massala : coordonnées acquises ✓',
+  'samosa chaud détecté (croustillant confirmé) ✓',
+  'lassi mangue : stock validé ✓',
+  'biryani géolocalisé à 200 m ✓',
+  'tuk-tuk en approche — tarif négocié ✓',
+  '⚠ vache sacrée sur la voie : contournement',
+  'klaxon calibré à 128 dB ✓',
+  'Taj Mahal indexé en haute résolution ✓',
+  'thé masala chai infusé ✓',
+  'chorégraphie Bollywood synchronisée ✓',
+  'MISSION TOURISTA : SUCCÈS — NAMASTÉ 🙏',
 ];
 
-function imLine(item) {
-  const feed = $('#imFeed');
-  if (!feed) return;
-  const span = document.createElement('span');
-  span.className = 'im-line imk-' + item.k;
-  let prefix = '> ';
-  let suffix = '';
-  if (item.k === 'ok') { prefix = '  '; suffix = ' <span class="chk">✓</span>'; }
-  else if (item.k === 'warn') { prefix = '  ! '; }
-  else if (item.k === 'final') { prefix = '>> '; }
-  span.innerHTML = prefix + item.t + suffix;
-  feed.appendChild(span);
-  feed.scrollTop = feed.scrollHeight;
-  if (item.k === 'final') beep(880, 0.12, 'sine', 0.08);
-  else beep(item.k === 'warn' ? 320 : 620, 0.04, 'square', 0.06);
+function fillTicker() {
+  const track = $('#ibTrack');
+  if (!track || track.childElementCount) return;
+  track.innerHTML = TOURISTA.concat(TOURISTA).map(t => '<span>' + t + '</span>').join('');
 }
 
-function spawnEmojis() {
-  const box = $('#imEmojis');
-  if (!box || REDUCED) return;
+function startIndianRain() {
+  const box = $('#indianRain');
+  if (!box) return;
+  box.classList.remove('hidden');
+  if (REDUCED) return;
   box.innerHTML = '';
   const set = ['🧀','🍛','🐘','🛺','🇮🇳','🙏','🥘','🫓','🐅','🪕'];
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < 40; i++) {
     const s = document.createElement('span');
     s.textContent = set[Math.floor(Math.random() * set.length)];
     s.style.left = (Math.random() * 100) + '%';
-    s.style.animationDuration = (4 + Math.random() * 5) + 's';
-    s.style.animationDelay = (Math.random() * 4) + 's';
-    s.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+    s.style.animationDuration = (5 + Math.random() * 6) + 's';
+    s.style.animationDelay = (Math.random() * 6) + 's';
+    s.style.fontSize = (1.1 + Math.random() * 2) + 'rem';
     box.appendChild(s);
   }
 }
 
-async function openIndian() {
+function enableIndian() {
   if (indianOn) return;
   indianOn = true;
   armAudio();
   try { stopDrone(); } catch (_) {}
-  const overlay = $('#indianMode');
-  const feed = $('#imFeed');
-  if (feed) feed.innerHTML = '';
-  if (overlay) overlay.classList.remove('hidden');
-  spawnEmojis();
-  flash(0.25, '#FF9933');
+  document.body.classList.add('indian');
+  fillTicker();
+  const banner = $('#indianBanner');
+  if (banner) banner.classList.remove('hidden');
+  startIndianRain();
+  flash(0.3, '#FF9933');
   indianAudio = $('#indianAudio');
   if (indianAudio) {
     indianAudio.volume = 0.8;
     indianAudio.currentTime = 0;
     indianAudio.play().catch(() => {});
   }
-  for (const item of TOURISTA) {
-    if (!indianOn) return;
-    imLine(item);
-    await sleep(item.k === 'final' ? 500 : 360);
-  }
 }
 
-function closeIndian() {
+function disableIndian() {
   if (!indianOn) return;
   indianOn = false;
-  const overlay = $('#indianMode');
-  if (overlay) overlay.classList.add('hidden');
+  document.body.classList.remove('indian');
+  const banner = $('#indianBanner');
+  if (banner) banner.classList.add('hidden');
+  const rain = $('#indianRain');
+  if (rain) { rain.classList.add('hidden'); rain.innerHTML = ''; }
   if (indianAudio) { indianAudio.pause(); indianAudio.currentTime = 0; }
-  const box = $('#imEmojis');
-  if (box) box.innerHTML = '';
   if (soundOn && hudReady) { try { startDrone(); } catch (_) {} }
+}
+
+function toggleIndian() {
+  if (indianOn) disableIndian(); else enableIndian();
 }
 
 window.addEventListener('keydown', e => {
@@ -1002,16 +992,15 @@ window.addEventListener('keydown', e => {
   kSeq = kSeq.slice(-KONAMI.length);
   if (KONAMI.every((k, i) => k === kSeq[i])) {
     kSeq = [];
-    openIndian();
+    toggleIndian();
   }
 });
 
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && indianOn) closeIndian();
+  if (e.key === 'Escape' && indianOn) disableIndian();
 });
 
-$('#indianMode').addEventListener('click', e => {
-  if (e.target.id === 'indianMode') closeIndian();
-});
+const ibClose = $('#ibClose');
+if (ibClose) ibClose.addEventListener('click', disableIndian);
 
 })();
